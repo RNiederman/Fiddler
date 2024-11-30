@@ -52,7 +52,7 @@ rm(roll_perms, roll_row_totals)
 
 
 ```{r}
-print( p == q)
+print(p == q)
 ```
 
 
