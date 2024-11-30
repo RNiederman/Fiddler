@@ -1,0 +1,58 @@
+https://thefiddler.substack.com/p/did-xkcd-get-its-math-right
+https://xkcd.com/3015/
+
+```{r}
+library(gtools)
+```
+
+
+determine p -> the odds that you draw two non-cursed arrows from a quiver of ten, where five are cursed, and five are not cursed
+```{r}
+
+arrow_set <- 1:10 # Let 1-5 be non-cursed and 6-10 be cursed
+arrow_perms <- gtools::permutations(n = 10, r = 10, v = arrow_set)
+arrow_perm_count <- nrow(arrow_perms)
+
+arrow_tester <- apply(arrow_perms[, 1:2], 1, function(rww) all(rww < 6))
+arrow_wins <- sum(arrow_tester)
+
+p <- arrow_wins/arrow_perm_count
+
+sprintf("%1.2f%%", p*100)
+
+```
+A bit of cleanup
+```{r}
+rm(arrow_perms, arrow_tester)
+```
+
+
+determine q -> the odds that the sum of rolling 3x six-sided dice and one-four-sided die will add up to at least 16
+```{r}
+
+roll_threshold <- 16
+d6 <- 1:6
+d4 <- 1:4
+
+roll_perms <- expand.grid(d6, d6, d6, d4)
+roll_perm_count <- nrow(roll_perms)
+roll_row_totals <- rowSums(roll_perms) 
+dice_wins <- sum(roll_row_totals >= roll_threshold)
+
+q <- dice_wins / roll_perm_count
+
+sprintf("%1.2f%%", q*100)
+
+```
+
+More cleanup
+```{r}
+rm(roll_perms, roll_row_totals)
+```
+
+
+```{r}
+print( p == q)
+```
+
+
