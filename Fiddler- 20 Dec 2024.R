@@ -24,18 +24,18 @@ primes <- test_set[prime_test]
 rm(test_set, prime_test)
 
 
-#### Step 2- Setup and run a linear optimization problem
+#### Step 2- Setup and run the linear optimization problem
 
 obj <- rep(1, length(primes))
 const_matrx <- matrix(primes, nrow = 1)
 
 result <- lp(
-              direction = "max",       # Maximize the right side
-              objective.i = obj,       # Objective coefficients
-              const.mat = const_matrx, # Constraint matrix
-              const.dir = "=",         # Constraint direction
-              const.rhs = target,      # Right hand side
-              all.bin = TRUE           # Binary variables
+             direction = "max",       # Maximize the right hand side
+             objective.in = obj,      # Objective coefficients
+             const.mat = const_matrx, # Constraint matrix
+             const.dir = "=",         # Constraint direction
+             const.rhs = target,      # Right hand side
+             all.bin = TRUE           # All variables are binary
 )
               
 soln_key <- result$solution
@@ -46,10 +46,7 @@ soln_key <- result$solution
 n_primes = sum(soln_key)
 primes_used <- primes[soln_key == 1]
 
-cat(sum(primes_used))
+print(sum(primes_used))
 
-cat(n_primes)
+print(n_primes)
 cat(primes_used,  sep = ", ")
-
-
-
