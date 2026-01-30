@@ -72,6 +72,7 @@ time_df <- tic.log(format = FALSE) %>%
   transmute(msg, time_delta = sprintf("%d:%02d", secs %/% 60, secs %% 60) )
 
 BAR_COLORS <- c("blue", "seagreen", "darkorange4")
+high_y <- rep(1, 3)
 
 # Main Fiddler
 soln <- sum(mc) / TRIALS
@@ -79,10 +80,10 @@ sprintf("%.2f", soln)
 # 3.47
 
 pt <- prop.table(table(mc))
-high_y <- max(pt) * 1.1
+high_y[1]  <- max(pt) * 1.1
 barplot(pt,
         col = BAR_COLORS[1],
-        ylim = c(0, high_y))
+        ylim = c(0, high_y[1]))
 
 # Extra Credit
 xc_soln <- sum(xc_mc) / TRIALS
@@ -90,10 +91,10 @@ sprintf("%.2f", xc_soln)
 # 13.61
 
 xc_pt <- prop.table(table(xc_mc))
-xc_high_y <- max(xc_pt) * 1.1
+high_y[2] <- max(xc_pt) * 1.1
 barplot(xc_pt,
         col = BAR_COLORS[2],
-        ylim = c(0, xc_high_y))
+        ylim = c(0, high_y[2]))
 
 # Extra Extra Credit
 xxc_soln <- sum(xxc_mc) / TRIALS
@@ -101,10 +102,10 @@ sprintf("%.2f", xxc_soln)
 # 30.63
 
 xxc_pt <- prop.table(table(xxc_mc))
-xxc_high_y <- max(xxc_pt) * 1.1
+high_y[3] <- max(xxc_pt) * 1.1
 barplot(xxc_pt,
         col = BAR_COLORS[3],
-        ylim = c(0, xxc_high_y))
+        ylim = c(0, high_y[3]))
 
 # Summaries
 summary(mc)
@@ -115,8 +116,7 @@ summary(xxc_mc)
 rm(ncores, cl, run_set)
 rm(BAR_COLORS)
 rm(list = ls(pattern = "mc"))
-rm(list = ls(pattern = "squares"))
-rm(list = ls(pattern = "msg"))
 rm(list = ls(pattern = "pt"))
-rm(list = ls(pattern = "high_y"))
+rm(high_y)
 
+# https://thefiddler.substack.com/p/can-you-hop-in-a-spiral
