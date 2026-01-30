@@ -38,6 +38,21 @@ Fiddler_Bingo <- function(rowws=3) {
 }
 
 
+Histogram_Builder <- function(vect, bar_color=NULL) {
+  if (is.null(bar_color)) {bar_color <- sample(colors(), 1)}
+  
+  pt <- prop.table(table(vect));
+  high_y  <- max(pt) * 1.1
+  bp <- barplot(pt,
+          col = bar_color,
+          ylim = c(0, high_y),
+          yaxt = "n")
+  axis(2, at = axTicks(2), labels = paste0(axTicks(2) * 100, "%"))
+  
+  return(invisible(bp))
+}
+
+
 # Monte Carlo Settings
 TRIALS <- 10^7
 run_set <- 1:TRIALS
@@ -72,40 +87,25 @@ time_df <- tic.log(format = FALSE) %>%
   transmute(msg, time_delta = sprintf("%d:%02d", secs %/% 60, secs %% 60) )
 
 BAR_COLORS <- c("blue", "seagreen", "darkorange4")
-high_y <- rep(1, 3)
 
 # Main Fiddler
+Histogram_Builder(mc, BAR_COLORS[1])
 soln <- sum(mc) / TRIALS
 sprintf("%.2f", soln)
 # 3.47
 
-pt <- prop.table(table(mc))
-high_y[1]  <- max(pt) * 1.1
-barplot(pt,
-        col = BAR_COLORS[1],
-        ylim = c(0, high_y[1]))
-
 # Extra Credit
+Histogram_Builder(xc_mc, BAR_COLORS[2])
 xc_soln <- sum(xc_mc) / TRIALS
 sprintf("%.2f", xc_soln)
 # 13.61
 
-xc_pt <- prop.table(table(xc_mc))
-high_y[2] <- max(xc_pt) * 1.1
-barplot(xc_pt,
-        col = BAR_COLORS[2],
-        ylim = c(0, high_y[2]))
-
 # Extra Extra Credit
+Histogram_Builder(xxc_mc, BAR_COLORS[3])
 xxc_soln <- sum(xxc_mc) / TRIALS
 sprintf("%.2f", xxc_soln)
 # 30.63
 
-xxc_pt <- prop.table(table(xxc_mc))
-high_y[3] <- max(xxc_pt) * 1.1
-barplot(xxc_pt,
-        col = BAR_COLORS[3],
-        ylim = c(0, high_y[3]))
 
 # Summaries
 summary(mc)
@@ -113,10 +113,7 @@ summary(xc_mc)
 summary(xxc_mc)
 
 # Clean-Up
-rm(ncores, cl, run_set)
-rm(BAR_COLORS)
-rm(list = ls(pattern = "mc"))
-rm(list = ls(pattern = "pt"))
-rm(high_y)
+# rm(ncores, cl, run_set, BAR_COLORS)
+# rm(list = ls(pattern = "mc"))
 
 # https://thefiddler.substack.com/p/can-you-hop-in-a-spiral
