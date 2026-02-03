@@ -33,7 +33,7 @@ def fiddler_tpir_wheel(intial_threshold=1/2):
 N = 10**7
 
 mc = Parallel(n_jobs=-2)(delayed(fiddler_tpir_wheel)(.5)
-                         for i in trange(N, unit_scale=True))
+                         for _ in trange(N, unit_scale=True))
 
 wins = sum(mc)
 print(f'{wins/N:.3%}')
