@@ -3,12 +3,14 @@
 library(magrittr)
 library(pbapply)
 
-points <- c(0, 1, 1, 2, 2, 3)
 
+points <- c(0, 1, 1, 2, 2, 3)
+questions <- length(points)
+threshold <- 1/2
 
 Fiddler_Learned_League <- function(correct=2) {
   require(magrittr)
-  wrong <- 6 - correct
+  wrong <- questions - correct
 
   them <- c(rep(T, correct), rep(F, wrong) ) %>% sample
   us <- sample(points)
@@ -28,12 +30,14 @@ trials <- 10^6
 
 mc2 <- pbreplicate(trials, Fiddler_Learned_League() )
 
-fiddler_main <- sum(mc2 > 1/2) / length(mc2)
+fiddler_main <- sum(mc2 > threshold) / length(mc2)
 sprintf("%1.1f%%", fiddler_main*100) 
 
 hist(mc2)
 
-rm(points, trials)
-rm(mc2)
+rm(points, questions, threshold)
+rm(trials, mc2)
 
 # 1 / 3
+
+# https://thefiddler.substack.com/p/how-many-rabbits-can-you-pull-out

@@ -39,3 +39,5 @@ sprintf("%1.2f%%", win_perc2*100)
 expected_games <- 1/win_perc2
 sprintf("%1.2f", expected_games)
 # 48.52
+
+# https://thefiddler.substack.com/p/can-you-ace-the-technical-interview

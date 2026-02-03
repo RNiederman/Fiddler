@@ -4,12 +4,15 @@ library(magrittr)
 library(parallel)
 library(furrr)
 
+
 points <- c(0, 1, 1, 2, 2, 3)
+questions <- length(points)
+threshold <- 1/2
 
 
 Fiddler_Learned_League <- function(correct=2) {
   require(magrittr)
-  wrong <- 6 - correct
+  wrong <- questions - correct
 
   them <- c(rep(T, correct), rep(F, wrong) ) %>% sample
   us <- sample(points)
@@ -26,7 +29,7 @@ Fiddler_Learned_League <- function(correct=2) {
 
 
 trials <- 10^6
-correct_answer_sets <- 1:5
+correct_answer_sets <- 1:(questions - 1)
 run_set <- rep(correct_answer_sets, trials)
 
 worker_cores <- detectCores() - 1
@@ -37,14 +40,16 @@ plan(multisession, workers = worker_cores)
 plan(sequential)
 
 
-fiddler_xc <- sum(mc > 1/2) / length(mc)
+fiddler_xc <- sum(mc > threshold) / length(mc)
 sprintf("%1.1f%%", fiddler_xc*100) 
 
 hist(mc)
 
-rm(points)
+rm(points, questions, threshold)
 rm(trials, correct_answer_sets)
 rm(run_set, worker_cores)
 rm(mc)
 
 # 43.3%
+
+# https://thefiddler.substack.com/p/how-many-rabbits-can-you-pull-out

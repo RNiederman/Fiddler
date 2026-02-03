@@ -5,6 +5,9 @@ library(parallel)
 library(furrr)
 library(tictoc)
 
+#### Part 0- Setup the Scoring Key Functions #### 
+
+
 # R - Rock
 # P - Paper
 # S - Scissors
@@ -44,48 +47,53 @@ RPSLS <- function(players=3) {
 }
 
 
-trials <- 10^7
+Vector_Slicer <- function(vect, label_set) {
+  chunks <- length(label_set)
+  sliced_vect <- split(vect, cut(seq_along(vect), chunks, labels = label_set))
+  return(sliced_vect)
+}
+
+
+#### Part 1- Monte Carlo Simulation #### 
+
+trials <- 10^6
+n_players <- 2:15
+run_set <- rep(n_players, each = trials)
+
 worker_cores <- detectCores() - 1
-
-tic.clearlog()
-
 options(future.rng.onMisuse = "ignore")
 plan(multisession, workers = worker_cores)
 
-# 3 Players
-tic(msg = "3 Players")
-  mc_3 <- future_map_lgl(1:trials, ~RPSLS(3))
-toc(log = TRUE)
-win_perc_3 <- sum(mc_3)/trials
-rm(mc_3)
-
-# 4 Players
-tic(msg = "4 Players")
-  mc_4 <- future_map_lgl(1:trials, ~RPSLS(4))
-toc(log = TRUE)
-win_perc_4 <- sum(mc_4)/trials
-rm(mc_4)
-
-# 5 Players
-tic(msg = "5 Players")
-  mc_5 <- future_map_lgl(1:trials, ~RPSLS(5))
-toc(log = TRUE)
+tic()
+  mc <- future_map_lgl(run_set, RPSLS)
+toc()
 
 plan(sequential)
 
-win_perc_5 <- sum(mc_5)/trials
-rm(mc_5, worker_cores)
+mc_split <- Vector_Slicer(mc, n_players)
+win_percs <- lapply(mc_split, mean)
 
-sprintf("%1.2f%%", win_perc_3*100)
-# 48%
 
-sprintf("%1.2f%%", win_perc_4*100)
-# 25.6%
+####  Part 2- Mathematical Solution ####
 
-sprintf("%1.2f%%", win_perc_5*100)
-# 12.8%
+rpsls_math_soln <- function(p) {
+  exp <- p - 1
+  right_side <- (2/5)^exp
+  answ <- p * right_side
+  
+  return(answ)
+}
 
-time_log <- tic.log(format = TRUE)
-print(time_log)
+
+math_percs <- rpsls_math_soln(n_players)
+
+#### Combined Solutions ####
+
+cbind(
+  "MC" = lapply(win_percs, function(x) sprintf("%1.2f%%", x*100)),
+  "Math" = sprintf("%1.2f%%", math_percs*100)
+)
+
+rm(mc, mc_split, run_set, worker_cores)
 
 # https://thefiddler.substack.com/p/how-many-dice-can-you-roll-the-same

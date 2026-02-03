@@ -1,12 +1,14 @@
 # https://thefiddler.substack.com/p/happy-almost-new-year-from-the-fiddler-f0b
 
+
 library(purrr)
-library(lpSolve)
+library(lpSolveAPI)
 
 
 #### Step 1- Get all the prime numbers from 1 to 2025
 
-is_prime <- function(n) {
+
+is_prime20 <- function(n) {
   
   two <- n == 2
   prime.test <- all(n %% 2:ceiling(sqrt(n)) > 0)
@@ -16,37 +18,51 @@ is_prime <- function(n) {
   return(tester)
 }
 
-target <- 2025
-test_set <- 1:target
 
-prime_test <- map_lgl(test_set, is_prime) 
-primes <- test_set[prime_test]
-rm(test_set, prime_test)
+target_20 <- 2025
+test_set_20 <- 1:target_20
+
+prime_test_20 <- map_lgl(test_set_20, is_prime20) 
+primes_20 <- test_set_20[prime_test_20]
+rm(test_set_20, prime_test_20)
 
 
 #### Step 2- Setup and run the linear optimization problem
 
-obj <- rep(1, length(primes))
-const_matrx <- matrix(primes, nrow = 1)
+L20 <- length(primes_20)
 
-result <- lp(
-             direction = "max",       # Maximize the right hand side
-             objective.in = obj,      # Objective coefficients
-             const.mat = const_matrx, # Constraint matrix
-             const.dir = "=",         # Constraint direction
-             const.rhs = target,      # Right hand side
-             all.bin = TRUE           # All variables are binary
-)
-              
-soln_key <- result$solution
+values_20 <- rep(1, L20)
+opt_type_20 <- "max"
+direction_20 <- "="
+problem_type_20 <- "binary"
+
+lp_model_20 <- make.lp(0, L20)
+
+set.objfn(lp_model_20, values_20)
+add.constraint(lp_model_20, primes_20, direction_20, target_20)
+
+lp.control(lp_model_20, sense = opt_type_20)
+set.type(lp_model_20, 1:L20, problem_type_20)
+
+
+#### Run the Problem ####
+
+solve(lp_model_20)
+key_20 <- get.variables(lp_model_20)
+get.objective(lp_model_20)
+get.constr.value(lp_model_20)
+get.total.iter(lp_model_20)
+get.solutioncount(lp_model_20)
 
 
 #### Step 3- Extract the prime numbers used
 
-n_primes = sum(soln_key)
-primes_used <- primes[soln_key == 1]
+n_primes_20 <- sum(key_20)
+primes_used_20 <- primes_20[key_20 == 1]
 
-print(sum(primes_used))
+print(sum(primes_used_20))
 
-print(n_primes)
-cat(primes_used,  sep = ", ")
+print(n_primes_20)
+cat(primes_used_20, sep = ", ")
+
+# https://thefiddler.substack.com/p/can-you-squeeze-the-sheets

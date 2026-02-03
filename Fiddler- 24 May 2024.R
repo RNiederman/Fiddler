@@ -20,3 +20,6 @@ mc <- pbreplicate(trials, fiddler_blackjack(card_deck))
 
 win_perc <- sum(mc)/trials
 sprintf("%1.2f%%", win_perc*100)
+# 17.50%
+
+# https://thefiddler.substack.com/p/can-you-ace-the-technical-interview
